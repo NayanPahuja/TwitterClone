@@ -1,6 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:twitter_clone/features/auth/controller/auth_controller.dart';
 import 'package:twitter_clone/features/auth/view/login_view.dart';
+import '../../../common/loading_page.dart';
 import 'login_view.dart';
 import '../../../common/common.dart';
 import '../../../constants/constants.dart';
@@ -8,31 +11,39 @@ import '../../../theme/pallete.dart';
 import '../widgets/auth_field.dart';
 
 
-class SignUpView extends StatefulWidget {
+class SignUpView extends ConsumerStatefulWidget {
   const SignUpView({super.key});
 
   @override
-  State<SignUpView> createState() => _SignUpViewState();
+  ConsumerState<SignUpView> createState() => _SignUpViewState();
 }
 
-class _SignUpViewState extends State<SignUpView> {
+class _SignUpViewState extends ConsumerState<SignUpView> {
   final appbar = UIConstants.appBar();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   @override
   void dispose() {
-    // TODO: implement dispose
+
     super.dispose();
     emailController.dispose();
     passwordController.dispose();
   }
+  void onSignUp(){
+    //call controller
+    final res = ref.read(authControllerProvider.notifier).signUp(
+        email: emailController.text,
+        password: passwordController.text,
+        context: context);
 
+  }
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authControllerProvider);
     return Scaffold(
       appBar: appbar,
-      body: Center(
+      body: isLoading ? const Loader() : Center(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -47,7 +58,7 @@ class _SignUpViewState extends State<SignUpView> {
                 //button
                 Align(
                     alignment: Alignment.topRight,
-                    child: smallButton(onTap: (){}, label: 'Done', backgroundColor: Pallete.whiteColor, fontColor: Pallete.backgroundColor,)),
+                    child: smallButton(onTap: onSignUp, label: 'Done', backgroundColor: Pallete.whiteColor, fontColor: Pallete.backgroundColor,)),
                 const SizedBox(height: 40,),
 
                 //textspan

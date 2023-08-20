@@ -14,14 +14,17 @@ class smallButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Chip(
-      backgroundColor:backgroundColor,
-      labelPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-      label: Text(label,
-      style: TextStyle(
-        color: fontColor,
-        fontSize: 16,
-      ),
-      ),);
+    return InkWell(
+      onTap: onTap,
+      child: Chip(
+        backgroundColor:backgroundColor,
+        labelPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+        label: Text(label,
+        style: TextStyle(
+          color: fontColor,
+          fontSize: 16,
+        ),
+        ),),
+    );
   }
 }

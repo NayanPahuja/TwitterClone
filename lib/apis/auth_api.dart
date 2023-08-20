@@ -32,13 +32,13 @@ class AuthAPI implements IAuthAPI{
     try{
       final account = await _account.create(userId: ID.unique(), email: email, password: password);
       return Right(account);
-    } on AppwriteException catch(e, stackTrace){
-      return Left(Failure(e.message??'Some unexpected error occurred', stackTrace as String));
+    } on AppwriteException catch(e,stackTrace ){
+      return Left(Failure(e.message??'Some unexpected error occurred', stackTrace.toString()));
     } on Exception
 
 
     catch(e, stackTrace){
-      return Left(Failure(e.toString(), stackTrace as String));
+      return Left(Failure(e.toString(), stackTrace.toString()));
     }
 
   }
