@@ -19,11 +19,31 @@ abstract class IAuthAPI{
     required String email,
     required String password,
 });
-
+  FutureEither<models.Session> login({
+    required String email,
+    required String password,
+  });
+  Future<models.User?> currentUserAccount();
 }
 
 
 class AuthAPI implements IAuthAPI{
+  @override
+  Future<models.User?> currentUserAccount() async{
+    // TODO: implement currentUserAccount
+    try{
+      return _account.get();
+    } on AppwriteException catch(e){
+      return null;
+    }
+    catch(e){
+      return null;
+    }
+
+  }
+
+
+
   final Account _account; //class has private variable to make instance of User class
   AuthAPI({required Account account}): _account = account; //constructor
   @override
@@ -42,5 +62,24 @@ class AuthAPI implements IAuthAPI{
     }
 
   }
+
+  @override
+  FutureEither<models.Session> login({required String email, required String password}) async{
+
+    try{
+      final session = await _account.createEmailSession(email: email, password: password);
+      return Right(session);
+
+    }
+    on AppwriteException catch(e, stackTrace){
+      return Left(Failure(e.message??'Some unexpected error occurred', stackTrace.toString()));
+    }
+    catch(e,stackTrace){
+      return Left(Failure(e.toString(), stackTrace.toString()));
+    }
+
+  }
+
+
 
 }
