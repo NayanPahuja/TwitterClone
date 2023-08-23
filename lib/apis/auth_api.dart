@@ -32,7 +32,7 @@ class AuthAPI implements IAuthAPI{
   Future<models.User?> currentUserAccount() async{
     // TODO: implement currentUserAccount
     try{
-      return _account.get();
+      return await _account.get();
     } on AppwriteException catch(e){
       return null;
     }

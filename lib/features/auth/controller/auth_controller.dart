@@ -4,20 +4,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twitter_clone/core/core.dart';
 import 'package:twitter_clone/features/home/view/home_view.dart';
+import 'package:twitter_clone/apis/user_api.dart';
+import 'package:twitter_clone/models/user_model.dart';
 
 import '../../../apis/auth_api.dart';
 import '../view/login_view.dart';
 
 final authControllerProvider = StateNotifierProvider<AuthController,bool >((ref) {
 
-  return AuthController(AuthAPI: ref.watch(authAPIProvider));
+  return AuthController(AuthAPI: ref.watch(authAPIProvider), userAPI: ref.watch(userAPIProvider));
   
 });
 
+//future provider
+final currentUserAccountProvider = FutureProvider<models.User?>((ref) async{
+  final user = await ref.watch(authControllerProvider.notifier).currentUser();
+  return user;
+});
 
 class AuthController extends StateNotifier<bool> {
   final AuthAPI _AuthAPI;
-  AuthController({required AuthAPI AuthAPI}): _AuthAPI = AuthAPI, super(false);
+  final userAPI _userAPI;
+  AuthController({required AuthAPI AuthAPI, required userAPI userAPI}): _AuthAPI = AuthAPI, _userAPI = userAPI, super(false);
   //isloading
 
   Future<models.User?> currentUser() => _AuthAPI.currentUserAccount();
@@ -35,10 +43,24 @@ class AuthController extends StateNotifier<bool> {
     //call api
     final response = await _AuthAPI.signUp(email: email, password: password);
     state = false;
-    response.fold((l) => showSnackBar(context, l.message), (r) {
+    response.fold((l) => showSnackBar(context, l.message), (r) async{
+      UserModel userModel = UserModel(
+          email: email,
+          name: getInitials(email),
+          uid: '',
+          profilePic: '',
+          bio: '',
+          bannerPic: '',
+          followers: const [],
+          following: const [],
+          isTwitterBlue: false
+      );
+      final res2 = await _userAPI.saveUserData(userModel: userModel);
+      res2.fold((l) => showSnackBar(context, l.message), (r) {
       showSnackBar(context, 'Account Created Successfully, Please Login');
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginView()));
-    } );
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginView()));
+      });
+  });
   }
   void login({
     required String email,

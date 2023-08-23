@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
 
 void showSnackBar(BuildContext context, String content){
   ScaffoldMessenger.of(context).showSnackBar(
@@ -6,4 +6,8 @@ void showSnackBar(BuildContext context, String content){
           content: Text(content),
       ));
 
+}
+
+String getInitials(String email){
+  return email.split('@')[0].toUpperCase();
 }
