@@ -16,6 +16,17 @@ final authControllerProvider = StateNotifierProvider<AuthController,bool >((ref)
   
 });
 
+final currentUserDetailsProvider = FutureProvider((ref) {
+  final userDetails =  ref.watch(userDetailsProvider()).currentUser();
+  return user;
+});
+
+final userDetailsProvider = FutureProvider.family((ref, String uid) async {
+  final user = await ref.watch(authControllerProvider.notifier);
+  return user.getUserData(uid);
+
+});
+
 //future provider
 final currentUserAccountProvider = FutureProvider<models.User?>((ref) async{
   final user = await ref.watch(authControllerProvider.notifier).currentUser();
@@ -55,7 +66,7 @@ class AuthController extends StateNotifier<bool> {
           following: const [],
           isTwitterBlue: false
       );
-      final res2 = await _userAPI.saveUserData(userModel: userModel);
+      final res2 = await _userAPI.saveUserData(userModel);
       res2.fold((l) => showSnackBar(context, l.message), (r) {
       showSnackBar(context, 'Account Created Successfully, Please Login');
           Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginView()));
@@ -77,5 +88,12 @@ class AuthController extends StateNotifier<bool> {
 
   }
 
+  Future<UserModel> getUserData(String uid, ) async{
+    final document = await _userAPI.getUserData(uid);
+    final updatedUser =  UserModel.fromMap(document.data);
+    return
+      updatedUser;
+
+  }
 
 }
